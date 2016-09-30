@@ -24,46 +24,62 @@ class Scrapers
     return array
   end
 
+  def nil_fix(element)
+    element.nil? ? "N/A" : element.text.strip
+  end
+
+  def xpath_fix(nodeSet)
+    nodeSet.empty? ? "N/A" : (nodeSet.map {|n| n}).join(' ').strip
+  end
+
+  def empty_arr_fix(arr)
+    arr.empty? ? ["N/A"] : arr.map {|el| el.text.strip}
+  end
+
   # All scrapers
-  def ddc_scraper(html)
+  def ddc_scraper(html, url)
     #==TEMPLATE==
     temp = "Dealer.com"
 
     #==ACCOUNT FIELDS==ARRAYS
     selector = "//meta[@name='author']/@content"
-    org = html.xpath(selector)
-    acc_phone = html.at_css('.value').text
+    org = xpath_fix(html.xpath(selector))
+    acc_phone = nil_fix(html.at_css('.value'))
 
     # ACCOUNT ADDRESS:
-    street = html.at_css('.adr .street-address').text
-    city = html.at_css('.adr .locality').text
-    state = html.at_css('.adr .region').text
-    zip = html.at_css('.adr .postal-code').text
+    street = nil_fix(html.at_css('.adr .street-address'))
+    city = nil_fix(html.at_css('.adr .locality'))
+    state = nil_fix(html.at_css('.adr .region'))
+    zip = nil_fix(html.at_css('.adr .postal-code'))
 
     #==CONTACT FIELDS==ARRAYS
-    full_names = html.css('#staffList .vcard .fn').map {|name| name.text.strip}
-    jobs = html.css('#staffList .vcard .title').map {|job| job.text.strip}
-    emails = html.css('#staffList .vcard .email').map {|email| email.text.strip}
+    full_names = empty_arr_fix(html.css('#staffList .vcard .fn'))
+    jobs = empty_arr_fix(html.css('#staffList .vcard .title'))
+    emails = empty_arr_fix(html.css('#staffList .vcard .email'))
 
     size = full_names.length
-    if jobs.length && emails.length == size
-      fnames = []
-      lnames = []
-      full_names.each {|name|
-        words = name.split(' ')
-        fnames.push(words[0])
-        lnames.push(words[-1])
-      }
+    if jobs.length != size
+      n = size - jobs.length
+      n.times {jobs.push("N/A")} if n >= 0
+    elsif emails.length != size
+      n = size - emails.length
+      n.times {emails.push("N/A")} if n >= 0
+    end
 
-      for i in 0...size
-        add_csv([temp, org, acc_phone, street, city, state, zip, jobs[i], fnames[i], lnames[i], emails[i]])
-      end
-    else
-      puts "Employee contact info column length error"
+    fnames = []
+    lnames = []
+    full_names.each {|name|
+      words = name.split(' ')
+      fnames.push(words[0])
+      lnames.push(words[-1])
+    }
+
+    for i in 0...size
+      add_csv([temp, org, acc_phone, street, city, state, zip, jobs[i], fnames[i], lnames[i], emails[i]])
     end
   end # End of Main Method: "def ddc_scraper"
 
-  def do_scraper(html)
+  def do_scraper(html, url)
     #==TEMPLATE==
     temp = "DealerOn"
 
@@ -101,7 +117,7 @@ class Scrapers
 
   end # End of Main Method: "def do_scraper"
 
-  def cobalt_scraper(html)   # Problems w/ cobalt_verify below.
+  def cobalt_scraper(html, url)   # Problems w/ cobalt_verify below.
     #==TEMPLATE==
     temp = "Cobalt"
 
@@ -143,7 +159,7 @@ class Scrapers
     end
   end # End of Main Method: "def cobalt_scraper"
 
-  def df_scraper(html)   # Problem w/ email.
+  def df_scraper(html, url)   # Problem w/ email.
     #==TEMPLATE==
     temp = "DealerFire"
 
@@ -188,7 +204,7 @@ class Scrapers
     end
   end # End of Main Method: "def df_scraper"
 
-  def di_scraper(html)
+  def di_scraper(html, url)
     #==TEMPLATE==
     temp = "DealerInspire"
 
