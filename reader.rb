@@ -8,8 +8,8 @@ class Reader
     @url_list = []
   end
 
-  def add_entry(url)
-    @url_list.push(url)
+  def add_entry(url, id)
+    @url_list.push({url: url, id: id})
   end
 
   def import_from_csv(file_name)
@@ -17,7 +17,9 @@ class Reader
     csv = CSV.parse(csv_text, headers: true, skip_blanks: true)
 
     csv.each do |row|
-      @url_list.push(row.to_s.chomp)
+      # @url_list.push(row.to_s.chomp)
+      row_hash = row.to_hash
+      add_entry(row_hash["url"], row_hash["id"])
     end
   end
 
@@ -40,12 +42,6 @@ class Reader
     # rescue
     #   puts "#{file_name} is not a valid CSV, please enter the name of a valid CSV file"
     #   read_csv
-    end
-  end
-
-  def get_all_urls
-    @url_list.each do |entry|
-      puts entry
     end
   end
 end

@@ -5,32 +5,33 @@ require_relative 'scrapers.rb'
 require_relative 'reader.rb'
 
 class TempFinder
-  def temp_method(item, docu, url)
+  def temp_method(item, docu, url, id)
     sc = Scrapers.new
 
     case item
     when "DDC"
-      sc.ddc_scraper(docu, url)
+      sc.ddc_scraper(docu, url, id)
       puts "Found DDC on Dealer.com template."
     when "dealeron"
-      sc.do_scraper(docu, url)
+      sc.do_scraper(docu, url, id)
       puts "Found dealeron on DealerOn.com template."
     when "cobalt"
-      sc.cobalt_scraper(docu, url)
+      sc.cobalt_scraper(docu, url, id)
       puts "Found cobalt on Cobalt.com template."
     when "DealerFire"
-      sc.df_scraper(docu, url)
+      sc.df_scraper(docu, url, id)
       puts "Found DealerFire on DealerFire.com template."
     when "di_homepage"
-      sc.di_scraper(docu, url)
+      sc.di_scraper(docu, url, id)
       puts "Found di_homepage on DealerInspire.com template."
     else
       puts "Template Version Unidentified."
     end
   end
 
-  def search(urls)
+  def search(url_list)
     temp_list = [ 'DDC', 'dealeron', 'cobalt', 'DealerFire', 'di_homepage' ]
+    urls = url_list.map {|hash| hash[:url]}
 
     urls.each do |url|
       doc = Nokogiri::HTML(open(url))
@@ -41,7 +42,8 @@ class TempFinder
 
         if verify
           result = true
-          temp_method(temp_list[i], doc, url)
+          id = url_list[urls.index(url)][:id]
+          temp_method(temp_list[i], doc, url, id)
         end
       end
 
@@ -50,7 +52,7 @@ class TempFinder
       end
 
       puts "delaying..."
-      delay_time = rand(15)
+      delay_time = rand(11)
       sleep(delay_time)
     end
   end

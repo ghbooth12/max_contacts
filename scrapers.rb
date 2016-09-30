@@ -37,7 +37,7 @@ class Scrapers
   end
 
   # All scrapers
-  def ddc_scraper(html, url)
+  def ddc_scraper(html, url, id)
     #==TEMPLATE==
     temp = "Dealer.com"
 
@@ -75,11 +75,11 @@ class Scrapers
     }
 
     for i in 0...size
-      add_csv([temp, org, acc_phone, street, city, state, zip, jobs[i], fnames[i], lnames[i], emails[i]])
+      add_csv([temp, id, url, org, acc_phone, street, city, state, zip, jobs[i], fnames[i], lnames[i], emails[i]])
     end
   end # End of Main Method: "def ddc_scraper"
 
-  def do_scraper(html, url)
+  def do_scraper(html, url, id)
     #==TEMPLATE==
     temp = "DealerOn"
 
@@ -117,7 +117,7 @@ class Scrapers
 
   end # End of Main Method: "def do_scraper"
 
-  def cobalt_scraper(html, url)   # Problems w/ cobalt_verify below.
+  def cobalt_scraper(html, url, id)   # Problems w/ cobalt_verify below.
     #==TEMPLATE==
     temp = "Cobalt"
 
@@ -159,7 +159,7 @@ class Scrapers
     end
   end # End of Main Method: "def cobalt_scraper"
 
-  def df_scraper(html, url)   # Problem w/ email.
+  def df_scraper(html, url, id)   # Problem w/ email.
     #==TEMPLATE==
     temp = "DealerFire"
 
@@ -204,7 +204,7 @@ class Scrapers
     end
   end # End of Main Method: "def df_scraper"
 
-  def di_scraper(html, url)
+  def di_scraper(html, url, id)
     #==TEMPLATE==
     temp = "DealerInspire"
 
